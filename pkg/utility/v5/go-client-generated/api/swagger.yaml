@@ -1,0 +1,1701 @@
+openapi: 3.0.0
+info:
+  title: 'Platform Utility function '
+  description: Other functions needed by anyone using the platform
+  version: "5.2"
+servers:
+- url: https://virtserver.swaggerhub.com/ndid/utility/0.1
+paths:
+  /utility/idp:
+    get:
+      summary: Retrieve all IdP nodes
+      description: ""
+      operationId: get_idp_list
+      parameters:
+      - name: min_ial
+        in: query
+        description: minimum ial supported by IDP looking for
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+      - name: min_aal
+        in: query
+        description: minimum aal supported by IDP looking for
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+      - name: agent
+        in: query
+        description: filter IdP agent type
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: on_the_fly_support
+        in: query
+        description: filter only IdP that support on-the-fly onboarding
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: filter_for_node_id
+        in: query
+        description: result IdP must be included in node's whitelist
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: IDP found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IDP'
+                x-content-type: application/json
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/idp/{namespace}/{identifier}:
+    get:
+      summary: "Retrieve all IdP nodes relevant to/authorized by/have onboarded this\
+        \ {namespace}/{identifier}."
+      description: ""
+      operationId: get_idp_list_for_identifier
+      parameters:
+      - name: namespace
+        in: path
+        description: ID Namespace
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: identifier
+        in: path
+        description: Identifier for the ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: min_ial
+        in: query
+        description: minimum ial supported by IDP looking for
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+      - name: min_aal
+        in: query
+        description: minimum aal supported by IDP looking for
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+      - name: on_the_fly_support
+        in: query
+        description: filter only IdP that support on-the-fly onboarding
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: mode
+        in: query
+        description: mode at the time of identity creation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          enum:
+          - 2
+          - 3
+      - name: filter_for_node_id
+        in: query
+        description: result IdP must be included in node's whitelist
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: IDP found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IDPForIdentity'
+                x-content-type: application/json
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/as/{service_id}:
+    get:
+      summary: Retrieve list of id of all available as given a service id
+      operationId: get_as_id_list
+      parameters:
+      - name: service_id
+        in: path
+        description: Service ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Service ID found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AS'
+                x-content-type: application/json
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Service ID not found
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/as/service_price/{service_id}:
+    get:
+      summary: Retrieve AS fee of a specific service_id
+      description: Retrieve AS fee history list sorted by latest first of a specific
+        service_id
+      parameters:
+      - name: service_id
+        in: path
+        description: Service ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: node_id
+        in: query
+        description: Filter by node ID
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Service price list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ASPrice'
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Service ID not found
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/service_price_ceiling:
+    get:
+      summary: Get maximum price allowed for AS pricing
+      parameters:
+      - name: service_id
+        in: query
+        description: Service ID
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Price ceiling list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceCeiling'
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Service ID not found
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/service_price_min_effective_datetime_delay:
+    get:
+      summary: Get service price minimum effective datetime delay
+      parameters:
+      - name: service_id
+        in: query
+        description: Service ID
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Price ceiling list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceMinEffectiveDatetimeDelay'
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Service ID not found
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/requests/{request_id}:
+    get:
+      summary: Fetch Request info and status
+      description: Fetch Request info and status
+      operationId: get_request_status
+      parameters:
+      - name: request_id
+        in: path
+        description: request ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Requests Exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestsStatus'
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: No request Exist
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/nodes/{node_id}/token:
+    get:
+      summary: Retrieve available token for node ID
+      description: ""
+      parameters:
+      - name: node_id
+        in: path
+        description: Node ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Node ID found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Node ID not found
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/nodes/{node_id}:
+    get:
+      summary: Retrieve information of node ID
+      description: ""
+      parameters:
+      - name: node_id
+        in: path
+        description: Node ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Node ID found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeInfo'
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Node ID not found
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/namespaces:
+    get:
+      summary: Retrieve list of all available namespaces
+      description: ""
+      responses:
+        "200":
+          description: Namespace list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200_1'
+                x-content-type: application/json
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/services:
+    get:
+      summary: Retrieve list of all available services
+      description: ""
+      responses:
+        "200":
+          description: Service list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200_2'
+                x-content-type: application/json
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/services/{service_id}:
+    get:
+      summary: Retrieve service details
+      description: ""
+      parameters:
+      - name: service_id
+        in: path
+        description: Service ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Service details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_3'
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Service ID does not exist
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/idp_error_codes:
+    get:
+      summary: Retrieve list of all IdP error codes
+      description: ""
+      responses:
+        "200":
+          description: Error code list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200_4'
+                x-content-type: application/json
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/as_error_codes:
+    get:
+      summary: Retrieve list of all AS error codes
+      description: ""
+      responses:
+        "200":
+          description: Error code list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200_4'
+                x-content-type: application/json
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/private_messages/{request_id}:
+    get:
+      summary: Get messages from MQ
+      description: Get messages received from message queue with specified request
+        ID
+      parameters:
+      - name: request_id
+        in: path
+        description: Request ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: node_id
+        in: query
+        description: Call this API as node ID
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Messages received from MQ (see InboundPrivateMessage and OutboundPrivateMessage
+            schemas for more details)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_5'
+        "404":
+          description: Request ID does not exist
+  /utility/private_message_removal:
+    post:
+      summary: Remove all messages from MQ
+      description: Remove all messages received from message queue
+      requestBody:
+        $ref: '#/components/requestBodies/Node'
+      responses:
+        "204":
+          description: Deleted
+  /utility/private_message_removal/{request_id}:
+    post:
+      summary: Remove messages from MQ
+      description: Remove messages from MQ with specified request ID
+      parameters:
+      - name: request_id
+        in: path
+        description: Request ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/Node'
+      responses:
+        "204":
+          description: Deleted
+  /utility/messages/{message_id}:
+    get:
+      summary: Fetch Message info
+      description: Fetch Message info
+      operationId: get_message
+      parameters:
+      - name: message_id
+        in: path
+        description: message ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Message Exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: No message Exist
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/request_types:
+    get:
+      summary: Get all valid request types
+      description: Get all valid request types
+      operationId: get_request_type_list
+      responses:
+        "200":
+          description: All valid request type list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                x-content-type: application/json
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: No message Exist
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/suppressed_identity_modification_notification_node_ids:
+    get:
+      summary: Get all suppressed identity modification notification node ID list
+      description: Get all suppressed identity modification notification node ID list
+      operationId: get_suppressed_identity_modification_notification_node_id_list
+      parameters:
+      - name: prefix
+        in: query
+        description: Node ID prefix
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: All suppressed identity modification notification node ID list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                x-content-type: application/json
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: No message Exist
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /utility/suppressed_identity_modification_notification_node_ids/{node_id}:
+    get:
+      summary: Get suppressed identity modification notification status
+      description: Get suppressed identity modification notification status by node
+        ID
+      operationId: get_suppressed_identity_modification_notification_status
+      parameters:
+      - name: node_id
+        in: path
+        description: Node ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Suppressed identity modification notification status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_6'
+        "400":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: No message Exist
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    IDP:
+      required:
+      - agent
+      - max_aal
+      - max_ial
+      - node_id
+      - node_name
+      - supported_request_message_data_url_type_list
+      type: object
+      properties:
+        node_id:
+          type: string
+        node_name:
+          type: string
+        max_ial:
+          type: number
+          enum:
+          - 1.1
+          - 1.2
+          - 1.3
+          - 2.1
+          - 2.2
+          - 2.3
+          - 3
+        max_aal:
+          type: number
+          enum:
+          - 1
+          - 2.1
+          - 2.2
+          - 3
+        on_the_fly_support:
+          type: boolean
+        supported_request_message_data_url_type_list:
+          type: array
+          description: IdP supported request message MIME types
+          example:
+          - text/plain
+          - application/pdf
+          items:
+            type: string
+        agent:
+          type: boolean
+      example:
+        agent: true
+        max_aal: 6.02745618307040320615897144307382404804229736328125
+        supported_request_message_data_url_type_list:
+        - text/plain
+        - application/pdf
+        node_name: node_name
+        max_ial: 0.80082819046101150206595775671303272247314453125
+        on_the_fly_support: true
+        node_id: node_id
+    IDPForIdentity:
+      required:
+      - agent
+      - ial
+      - max_aal
+      - max_ial
+      - mode_list
+      - node_id
+      - node_name
+      - supported_request_message_data_url_type_list
+      type: object
+      properties:
+        node_id:
+          type: string
+        node_name:
+          type: string
+        max_ial:
+          type: number
+          enum:
+          - 1.1
+          - 1.2
+          - 1.3
+          - 2.1
+          - 2.2
+          - 2.3
+          - 3
+        max_aal:
+          type: number
+          enum:
+          - 1
+          - 2.1
+          - 2.2
+          - 3
+        on_the_fly_support:
+          type: boolean
+        supported_request_message_data_url_type_list:
+          type: array
+          description: IdP supported request message MIME types
+          example:
+          - text/plain
+          - application/pdf
+          items:
+            type: string
+        agent:
+          type: boolean
+        mode_list:
+          type: array
+          items:
+            type: integer
+            enum:
+            - 2
+            - 3
+        ial:
+          type: number
+          enum:
+          - 1.1
+          - 1.2
+          - 1.3
+          - 2.1
+          - 2.2
+          - 2.3
+          - 3
+        lial:
+          type: boolean
+        laal:
+          type: boolean
+      example:
+        mode_list:
+        - 1
+        - 1
+        agent: true
+        laal: true
+        max_aal: 6.02745618307040320615897144307382404804229736328125
+        ial: 5.962133916683182377482808078639209270477294921875
+        supported_request_message_data_url_type_list:
+        - text/plain
+        - application/pdf
+        node_name: node_name
+        lial: true
+        max_ial: 0.80082819046101150206595775671303272247314453125
+        on_the_fly_support: true
+        node_id: node_id
+    AS:
+      required:
+      - min_aal
+      - min_ial
+      - node_id
+      - node_name
+      - supported_namespace_list
+      type: object
+      properties:
+        node_id:
+          type: string
+        node_name:
+          type: string
+        min_ial:
+          type: number
+          enum:
+          - 1.1
+          - 1.2
+          - 1.3
+          - 2.1
+          - 2.2
+          - 2.3
+          - 3
+        min_aal:
+          type: number
+          enum:
+          - 1
+          - 2.1
+          - 2.2
+          - 3
+        supported_namespace_list:
+          type: array
+          items:
+            type: string
+      example:
+        min_aal: 6.02745618307040320615897144307382404804229736328125
+        node_name: node_name
+        min_ial: 0.80082819046101150206595775671303272247314453125
+        supported_namespace_list:
+        - supported_namespace_list
+        - supported_namespace_list
+        node_id: node_id
+    ASPrice:
+      type: array
+      items:
+        $ref: '#/components/schemas/ASPrice_inner'
+      x-schema-name: ASPrice
+    PriceCeiling:
+      required:
+      - price_ceiling_by_currency_list
+      - service_id
+      type: object
+      properties:
+        service_id:
+          type: string
+        price_ceiling_by_currency_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceCeiling_price_ceiling_by_currency_list'
+      example:
+        service_id: service_id
+        price_ceiling_by_currency_list:
+        - price: 0.80082819046101150206595775671303272247314453125
+          currency: THB
+        - price: 0.80082819046101150206595775671303272247314453125
+          currency: THB
+    PriceMinEffectiveDatetimeDelay:
+      required:
+      - duration_second
+      type: object
+      properties:
+        duration_second:
+          type: number
+      example:
+        duration_second: 0.80082819046101150206595775671303272247314453125
+    RequestsStatus:
+      required:
+      - closed
+      - creation_block_height
+      - data_request_list
+      - idp_id_list
+      - min_aal
+      - min_ial
+      - min_idp
+      - mode
+      - request_id
+      - request_message_hash
+      - request_timeout
+      - requester_node_id
+      - response_list
+      - status
+      - timed_out
+      type: object
+      properties:
+        request_id:
+          type: string
+        requester_node_id:
+          type: string
+        mode:
+          type: integer
+          enum:
+          - 1
+          - 2
+          - 3
+        request_message_hash:
+          type: string
+        min_ial:
+          type: number
+          enum:
+          - 1.1
+          - 1.2
+          - 1.3
+          - 2.1
+          - 2.2
+          - 2.3
+          - 3
+        min_aal:
+          type: number
+          enum:
+          - 1
+          - 2.1
+          - 2.2
+          - 3
+        min_idp:
+          type: integer
+        idp_id_list:
+          type: array
+          items:
+            type: string
+        response_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestsStatus_response_list'
+        data_request_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestsStatus_data_request_list'
+        request_timeout:
+          type: integer
+        timed_out:
+          type: boolean
+        closed:
+          type: boolean
+        request_type:
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - confirmed
+          - rejected
+          - partial_completed
+          - completed
+          - complicated
+          - errored
+        creation_block_height:
+          type: string
+          description: <CHAIN_ID>:<BLOCK_HEIGHT>
+      example:
+        request_timeout: 2
+        request_type: request_type
+        min_idp: 5
+        idp_id_list:
+        - idp_id_list
+        - idp_id_list
+        requester_node_id: requester_node_id
+        request_message_hash: request_message_hash
+        min_ial: 6.02745618307040320615897144307382404804229736328125
+        timed_out: true
+        mode: 0
+        min_aal: 1.46581298050294517310021547018550336360931396484375
+        response_list:
+        - valid_signature: true
+          ial: 5.63737665663332876420099637471139430999755859375
+          signature: signature
+          idp_id: idp_id
+          valid_ial: true
+          error_code: 7.061401241503109105224211816675961017608642578125
+          aal: 2.3021358869347654518833223846741020679473876953125
+          status: accept
+        - valid_signature: true
+          ial: 5.63737665663332876420099637471139430999755859375
+          signature: signature
+          idp_id: idp_id
+          valid_ial: true
+          error_code: 7.061401241503109105224211816675961017608642578125
+          aal: 2.3021358869347654518833223846741020679473876953125
+          status: accept
+        closed: true
+        data_request_list:
+        - response_list:
+          - received_data: true
+            as_id: as_id
+            signed: true
+            error_code: 3.61607674925191080461672754609026014804840087890625
+          - received_data: true
+            as_id: as_id
+            signed: true
+            error_code: 3.61607674925191080461672754609026014804840087890625
+          as_id_list:
+          - as_id_list
+          - as_id_list
+          min_as: 9
+          service_id: service_id
+          request_params_hash: request_params_hash
+        - response_list:
+          - received_data: true
+            as_id: as_id
+            signed: true
+            error_code: 3.61607674925191080461672754609026014804840087890625
+          - received_data: true
+            as_id: as_id
+            signed: true
+            error_code: 3.61607674925191080461672754609026014804840087890625
+          as_id_list:
+          - as_id_list
+          - as_id_list
+          min_as: 9
+          service_id: service_id
+          request_params_hash: request_params_hash
+        creation_block_height: creation_block_height
+        request_id: request_id
+        status: pending
+    NodeInfo:
+      required:
+      - active
+      - master_public_key
+      - node_name
+      - public_key
+      - role
+      type: object
+      properties:
+        public_key:
+          type: string
+        master_public_key:
+          type: string
+        node_name:
+          type: string
+        role:
+          type: string
+          enum:
+          - IdP
+          - RP
+          - AS
+          - Proxy
+        max_ial:
+          type: number
+          description: Available when node's role is IdP
+          enum:
+          - 1.1
+          - 1.2
+          - 1.3
+          - 2.1
+          - 2.2
+          - 2.3
+          - 3
+        max_aal:
+          type: number
+          description: Available when node's role is IdP
+          enum:
+          - 1
+          - 2.1
+          - 2.2
+          - 3
+        on_the_fly_support:
+          type: boolean
+          description: Available when node's role is IdP
+        supported_request_message_data_url_type_list:
+          type: array
+          description: Present only on IdP nodes. Supported request message MIME types.
+          example:
+          - text/plain
+          - application/pdf
+          items:
+            type: string
+        agent:
+          type: boolean
+          description: Present only on IdP nodes
+        node_id_whitelist:
+          type: array
+          description: Present only on RP and IdP nodes
+          items:
+            type: string
+        node_id_whitelist_active:
+          type: boolean
+          description: Present only on RP and IdP nodes
+        mq:
+          type: array
+          items:
+            $ref: '#/components/schemas/NodeInfo_mq'
+        proxy:
+          $ref: '#/components/schemas/NodeInfo_proxy'
+        active:
+          type: boolean
+      example:
+        public_key: public_key
+        agent: true
+        role: IdP
+        mq:
+        - port: 1.46581298050294517310021547018550336360931396484375
+          ip: ip
+        - port: 1.46581298050294517310021547018550336360931396484375
+          ip: ip
+        max_aal: 6.02745618307040320615897144307382404804229736328125
+        supported_request_message_data_url_type_list:
+        - text/plain
+        - application/pdf
+        node_name: node_name
+        active: true
+        max_ial: 0.80082819046101150206595775671303272247314453125
+        on_the_fly_support: true
+        node_id_whitelist:
+        - node_id_whitelist
+        - node_id_whitelist
+        proxy:
+          public_key: public_key
+          mq: null
+          node_name: node_name
+          master_public_key: master_public_key
+          config: config
+          node_id: node_id
+        node_id_whitelist_active: true
+        master_public_key: master_public_key
+    InboundPrivateMessage:
+      type: array
+      items:
+        $ref: '#/components/schemas/InboundPrivateMessage_inner'
+    OutboundPrivateMessage:
+      type: array
+      items:
+        $ref: '#/components/schemas/OutboundPrivateMessage_inner'
+    Message:
+      required:
+      - creation_block_height
+      - message
+      - message_hash
+      - purpose
+      - request_id
+      - requester_node_id
+      type: object
+      properties:
+        message_id:
+          type: string
+        requester_node_id:
+          type: string
+        message:
+          type: string
+        purpose:
+          type: string
+        creation_block_height:
+          type: string
+          description: <CHAIN_ID>:<BLOCK_HEIGHT>
+      example:
+        purpose: purpose
+        requester_node_id: requester_node_id
+        message_id: message_id
+        message: message
+        creation_block_height: creation_block_height
+    Error:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/Error_error'
+    inline_response_200:
+      required:
+      - amount
+      type: object
+      properties:
+        amount:
+          type: integer
+      example:
+        amount: 0
+    inline_response_200_1:
+      required:
+      - active
+      - namespace
+      type: object
+      properties:
+        namespace:
+          type: string
+        description:
+          type: string
+        active:
+          type: boolean
+        allowed_identifier_count_in_reference_group:
+          type: integer
+        allowed_active_identifier_count_in_reference_group:
+          type: integer
+      example:
+        allowed_active_identifier_count_in_reference_group: 6
+        allowed_identifier_count_in_reference_group: 0
+        namespace: namespace
+        description: description
+        active: true
+    inline_response_200_2:
+      required:
+      - active
+      - service_id
+      - service_name
+      type: object
+      properties:
+        service_id:
+          type: string
+        service_name:
+          type: string
+        active:
+          type: boolean
+      example:
+        service_name: service_name
+        service_id: service_id
+        active: true
+    inline_response_200_3:
+      required:
+      - active
+      - service_id
+      - service_name
+      type: object
+      properties:
+        service_id:
+          type: string
+        service_name:
+          type: string
+        data_schema:
+          type: string
+        data_schema_version:
+          type: string
+        active:
+          type: boolean
+      example:
+        service_name: service_name
+        data_schema_version: data_schema_version
+        service_id: service_id
+        data_schema: data_schema
+        active: true
+    inline_response_200_4:
+      required:
+      - description
+      - error_code
+      type: object
+      properties:
+        error_code:
+          type: number
+        description:
+          type: string
+      example:
+        description: description
+        error_code: 0.80082819046101150206595775671303272247314453125
+    inline_response_200_5:
+      oneOf:
+      - $ref: '#/components/schemas/InboundPrivateMessage'
+      - $ref: '#/components/schemas/OutboundPrivateMessage'
+    inline_response_200_6:
+      required:
+      - suppressed
+      type: object
+      properties:
+        suppressed:
+          type: boolean
+      example:
+        suppressed: true
+    ASPrice_inner:
+      required:
+      - node_id
+      - price_list
+      type: object
+      properties:
+        node_id:
+          type: string
+        price_list:
+          type: array
+          items:
+            required:
+            - creation_block_height
+            - currency
+            - effective_datetime
+            - max_price
+            - min_price
+            type: object
+            properties:
+              price_by_currency_list:
+                type: array
+                items:
+                  required:
+                  - currency
+                  - max_price
+                  - min_price
+                  type: object
+                  properties:
+                    currency:
+                      type: string
+                      enum:
+                      - THB
+                    min_price:
+                      type: number
+                    max_price:
+                      type: number
+                  example:
+                    max_price: 6.02745618307040320615897144307382404804229736328125
+                    min_price: 0.80082819046101150206595775671303272247314453125
+                    currency: THB
+              effective_datetime:
+                type: string
+                format: date
+              more_info_url:
+                type: string
+              detail:
+                type: string
+              creation_block_height:
+                type: string
+                description: <CHAIN_ID>:<BLOCK_HEIGHT>
+            example:
+              price_by_currency_list:
+              - max_price: 6.02745618307040320615897144307382404804229736328125
+                min_price: 0.80082819046101150206595775671303272247314453125
+                currency: THB
+              - max_price: 6.02745618307040320615897144307382404804229736328125
+                min_price: 0.80082819046101150206595775671303272247314453125
+                currency: THB
+              detail: detail
+              effective_datetime: 2000-01-23
+              creation_block_height: creation_block_height
+              more_info_url: more_info_url
+      example:
+        price_list:
+        - price_by_currency_list:
+          - max_price: 6.02745618307040320615897144307382404804229736328125
+            min_price: 0.80082819046101150206595775671303272247314453125
+            currency: THB
+          - max_price: 6.02745618307040320615897144307382404804229736328125
+            min_price: 0.80082819046101150206595775671303272247314453125
+            currency: THB
+          detail: detail
+          effective_datetime: 2000-01-23
+          creation_block_height: creation_block_height
+          more_info_url: more_info_url
+        - price_by_currency_list:
+          - max_price: 6.02745618307040320615897144307382404804229736328125
+            min_price: 0.80082819046101150206595775671303272247314453125
+            currency: THB
+          - max_price: 6.02745618307040320615897144307382404804229736328125
+            min_price: 0.80082819046101150206595775671303272247314453125
+            currency: THB
+          detail: detail
+          effective_datetime: 2000-01-23
+          creation_block_height: creation_block_height
+          more_info_url: more_info_url
+        node_id: node_id
+    PriceCeiling_price_ceiling_by_currency_list:
+      required:
+      - currency
+      - price
+      type: object
+      properties:
+        currency:
+          type: string
+          enum:
+          - THB
+        price:
+          type: number
+      example:
+        price: 0.80082819046101150206595775671303272247314453125
+        currency: THB
+    RequestsStatus_response_list:
+      required:
+      - idp_id
+      type: object
+      properties:
+        ial:
+          type: number
+          enum:
+          - 1.1
+          - 1.2
+          - 1.3
+          - 2.1
+          - 2.2
+          - 2.3
+          - 3
+        aal:
+          type: number
+          enum:
+          - 1
+          - 2.1
+          - 2.2
+          - 3
+        status:
+          type: string
+          enum:
+          - accept
+          - reject
+        error_code:
+          type: number
+        signature:
+          type: string
+        idp_id:
+          type: string
+        valid_signature:
+          type: boolean
+          description: Whether response signature is correct
+        valid_ial:
+          type: boolean
+          description: Whether response IAL is less than or equal to identity IAL
+      example:
+        valid_signature: true
+        ial: 5.63737665663332876420099637471139430999755859375
+        signature: signature
+        idp_id: idp_id
+        valid_ial: true
+        error_code: 7.061401241503109105224211816675961017608642578125
+        aal: 2.3021358869347654518833223846741020679473876953125
+        status: accept
+    RequestsStatus_response_list_1:
+      required:
+      - as_id
+      type: object
+      properties:
+        as_id:
+          type: string
+        signed:
+          type: boolean
+        received_data:
+          type: boolean
+        error_code:
+          type: number
+      example:
+        received_data: true
+        as_id: as_id
+        signed: true
+        error_code: 3.61607674925191080461672754609026014804840087890625
+    RequestsStatus_data_request_list:
+      required:
+      - as_id_list
+      - min_as
+      - request_params_hash
+      - service_id
+      type: object
+      properties:
+        service_id:
+          type: string
+        as_id_list:
+          type: array
+          items:
+            type: string
+        min_as:
+          type: integer
+        request_params_hash:
+          type: string
+        response_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestsStatus_response_list_1'
+      example:
+        response_list:
+        - received_data: true
+          as_id: as_id
+          signed: true
+          error_code: 3.61607674925191080461672754609026014804840087890625
+        - received_data: true
+          as_id: as_id
+          signed: true
+          error_code: 3.61607674925191080461672754609026014804840087890625
+        as_id_list:
+        - as_id_list
+        - as_id_list
+        min_as: 9
+        service_id: service_id
+        request_params_hash: request_params_hash
+    NodeInfo_mq:
+      type: object
+      properties:
+        ip:
+          type: string
+        port:
+          type: number
+      example:
+        port: 1.46581298050294517310021547018550336360931396484375
+        ip: ip
+    NodeInfo_proxy:
+      required:
+      - config
+      - master_public_key
+      - node_id
+      - node_name
+      - public_key
+      type: object
+      properties:
+        node_id:
+          type: string
+        node_name:
+          type: string
+        public_key:
+          type: string
+        master_public_key:
+          type: string
+        mq:
+          $ref: '#/components/schemas/NodeInfo_mq'
+        config:
+          type: string
+      example:
+        public_key: public_key
+        mq: null
+        node_name: node_name
+        master_public_key: master_public_key
+        config: config
+        node_id: node_id
+    InboundPrivateMessage_inner:
+      required:
+      - direction
+      - message
+      - signature
+      - source
+      - timestamp
+      type: object
+      properties:
+        message:
+          type: object
+          properties:
+            type:
+              type: string
+            request_id:
+              type: string
+            mode:
+              type: number
+              enum:
+              - 1
+              - 2
+              - 3
+            idp_id:
+              type: string
+            chain_id:
+              type: string
+            height:
+              type: number
+        direction:
+          type: string
+          enum:
+          - inbound
+        source:
+          required:
+          - node_id
+          type: object
+          properties:
+            node_id:
+              type: string
+            proxy_node_id:
+              type: string
+            proxy_config:
+              type: string
+              enum:
+              - KEY_ON_PROXY
+              - KEY_ON_NODE
+        signature:
+          type: string
+        signature_for_proxy:
+          type: string
+        timestamp:
+          type: number
+    OutboundPrivateMessage_inner:
+      required:
+      - destinations
+      - direction
+      - message
+      - timestamp
+      type: object
+      properties:
+        message:
+          type: string
+        direction:
+          type: string
+          enum:
+          - outbound
+        destinations:
+          type: array
+          items:
+            required:
+            - ip
+            - node_id
+            - port
+            - public_key
+            type: object
+            properties:
+              node_id:
+                type: string
+              public_key:
+                type: string
+              ip:
+                type: string
+              port:
+                type: number
+              proxy_node_id:
+                type: string
+              proxy_public_key:
+                type: string
+              proxy_config:
+                type: string
+                enum:
+                - KEY_ON_PROXY
+                - KEY_ON_NODE
+        timestamp:
+          type: number
+    Error_error:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+  requestBodies:
+    Node:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              node_id:
+                type: string
+                description: Call this API as node ID
